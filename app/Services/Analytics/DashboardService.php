@@ -74,9 +74,11 @@ class DashboardService
             'transactions' => $this->metric($today['transactions'], $yesterday['transactions']),
             'itemsSold' => $this->metric($today['items'], $yesterday['items']),
             'averageOrder' => $this->metric($today['average'], $yesterday['average']),
-            'grossProfit' => $this->metric($today['profit'], $yesterday['profit']),
+            'grossProfit' => $this->metric($today['grossProfit'], $yesterday['grossProfit']),
+            'netProfit' => $this->metric($today['profit'], $yesterday['profit']),
+            'expenses' => $this->metric($today['expenses'], $yesterday['expenses']),
             'marginPercent' => $today['revenue'] > 0
-                ? round($today['profit'] / $today['revenue'] * 100, 1)
+                ? round($today['grossProfit'] / $today['revenue'] * 100, 1)
                 : 0.0,
             'cogs' => $today['cost'],
             'monthToDate' => [
@@ -500,12 +502,18 @@ class DashboardService
         $revenue = (int) ($sales->revenue ?? 0);
         $cost = (int) ($items->cost ?? 0);
 
+        $expenses = (int) DB::table('expenses')
+            ->whereBetween('date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
+            ->sum('amount');
+
         return [
             'transactions' => $transactions,
             'revenue' => $revenue,
             'items' => (int) ($items->quantity ?? 0),
             'cost' => $cost,
-            'profit' => $revenue - $cost,
+            'profit' => $revenue - $cost - $expenses, // Net profit
+            'grossProfit' => $revenue - $cost,
+            'expenses' => $expenses,
             'average' => $transactions > 0 ? (int) round($revenue / $transactions) : 0,
         ];
     }

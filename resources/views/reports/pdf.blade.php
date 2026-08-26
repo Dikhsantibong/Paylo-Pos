@@ -281,6 +281,14 @@
             <td class="label">Laba kotor</td>
             <td class="value">{{ $rupiah($summary['grossProfit']) }}</td>
         </tr>
+        <tr>
+            <td class="label">Pengeluaran operasional</td>
+            <td class="value negative">({{ $rupiah($summary['expenses']) }})</td>
+        </tr>
+        <tr class="result">
+            <td class="label">Laba bersih</td>
+            <td class="value">{{ $rupiah($summary['netProfit']) }}</td>
+        </tr>
     </table>
 
     <table class="data" style="margin-top:8px;">

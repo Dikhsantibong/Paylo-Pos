@@ -56,6 +56,8 @@ class ReportService
             'revenueTrend' => $this->trend($current['revenue'], $previous['revenue']),
             'transactionsTrend' => $this->trend($current['transactions'], $previous['transactions']),
             'profitTrend' => $this->trend($current['grossProfit'], $previous['grossProfit']),
+            'netProfitTrend' => $this->trend($current['netProfit'], $previous['netProfit']),
+            'expensesTrend' => $this->trend($current['expenses'], $previous['expenses']),
         ];
     }
 
@@ -268,6 +270,12 @@ class ReportService
         $netRevenue = $revenue - $tax;
         $grossProfit = $netRevenue - $cost;
 
+        $expenses = (int) DB::table('expenses')
+            ->whereBetween('date', [$period->start->format('Y-m-d'), $period->end->format('Y-m-d')])
+            ->sum('amount');
+        
+        $netProfit = $grossProfit - $expenses;
+
         return [
             'transactions' => $transactions,
             'itemsSold' => (int) ($items->quantity ?? 0),
@@ -278,6 +286,8 @@ class ReportService
             'netRevenue' => $netRevenue,
             'cogs' => $cost,
             'grossProfit' => $grossProfit,
+            'expenses' => $expenses,
+            'netProfit' => $netProfit,
             'marginPercent' => $netRevenue > 0 ? round($grossProfit / $netRevenue * 100, 1) : 0.0,
             'foodCostPercent' => $netRevenue > 0 ? round($cost / $netRevenue * 100, 1) : 0.0,
             'averageOrderValue' => $transactions > 0 ? (int) round($revenue / $transactions) : 0,

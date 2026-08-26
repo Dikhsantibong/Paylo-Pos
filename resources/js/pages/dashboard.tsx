@@ -227,6 +227,19 @@ export default function Dashboard({
                 {/* ── Profitability strip ──────────────────────── */}
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <KpiCard
+                        label="Laba bersih hari ini"
+                        value={rupiah(kpis.netProfit.value)}
+                        trend={kpis.netProfit.trend}
+                        icon={Banknote}
+                        accent="success"
+                    />
+                    <KpiCard
+                        label="Pengeluaran hari ini"
+                        value={rupiah(kpis.expenses.value)}
+                        trend={kpis.expenses.trend}
+                        icon={TrendingUp}
+                    />
+                    <KpiCard
                         label="Laba kotor hari ini"
                         value={rupiah(kpis.grossProfit.value)}
                         trend={kpis.grossProfit.trend}

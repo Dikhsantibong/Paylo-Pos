@@ -5,8 +5,16 @@ export type Category = {
     name: string;
     slug: string;
     sort_order: number;
-    is_active?: boolean;
-    products_count?: number;
+    is_active: boolean;
+    products_count: number;
+    active_products_count: number;
+};
+
+export type Expense = {
+    id: number;
+    date: string;
+    amount: number | string;
+    notes: string | null;
 };
 
 export type ProductVariant = {
@@ -242,6 +250,8 @@ export type DashboardKpis = {
     itemsSold: Metric;
     averageOrder: Metric;
     grossProfit: Metric;
+    netProfit: Metric;
+    expenses: Metric;
     marginPercent: number;
     cogs: number;
     monthToDate: {

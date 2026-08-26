@@ -12,6 +12,7 @@ import {
     UserCog,
     Users,
     Warehouse,
+    Receipt,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -95,6 +96,12 @@ const navigation: { label: string; items: NavItem[] }[] = [
                 title: 'Pelanggan',
                 href: '/customers',
                 icon: Users,
+                roles: ['owner', 'kasir'],
+            },
+            {
+                title: 'Pengeluaran',
+                href: '/expenses',
+                icon: Receipt,
                 roles: ['owner', 'kasir'],
             },
         ],

@@ -66,6 +66,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('inventory/{ingredient}', [InventoryController::class, 'update'])->name('inventory.update');
         Route::post('inventory/{ingredient}/add-stock', [InventoryController::class, 'addStock'])->name('inventory.add-stock');
         Route::get('inventory/{ingredient}/history', [InventoryController::class, 'history'])->name('inventory.history');
+
+        // Expenses
+        Route::get('expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->name('expenses.index');
+        Route::post('expenses', [\App\Http\Controllers\ExpenseController::class, 'store'])->name('expenses.store');
+        Route::put('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'update'])->name('expenses.update');
+        Route::delete('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'destroy'])->name('expenses.destroy');
     });
 
     /*

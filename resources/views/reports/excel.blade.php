@@ -104,6 +104,14 @@
         <td colspan="4" style="{{ $td }} background-color:#ECFDF3; font-weight:bold; color:#027A48;">  LABA KOTOR</td>
         <td colspan="3" style="{{ $num }} background-color:#ECFDF3; font-weight:bold; color:#027A48;">{{ $rupiah($summary['grossProfit']) }}  </td>
     </tr>
+    <tr>
+        <td colspan="4" style="{{ $td }}">  Pengeluaran operasional</td>
+        <td colspan="3" style="{{ $num }} color:#D92D20;">({{ $rupiah($summary['expenses']) }})  </td>
+    </tr>
+    <tr>
+        <td colspan="4" style="{{ $td }} background-color:#EFF8FF; font-weight:bold; color:#175CD3;">  LABA BERSIH</td>
+        <td colspan="3" style="{{ $num }} background-color:#EFF8FF; font-weight:bold; color:#175CD3;">{{ $rupiah($summary['netProfit']) }}  </td>
+    </tr>
     <tr><td colspan="7" style="height:10px;"></td></tr>
 
     {{-- ── Produk ─────────────────────────────────────────── --}}

@@ -94,6 +94,13 @@ Saat checkout, `CheckoutService` menyimpan `unit_cost` dan `cost_subtotal` ke
 bahan baku berubah kemudian — dan dashboard bisa menjumlahkan margin tanpa
 menelusuri resep pada setiap request.
 
+### Pengeluaran & Laba Bersih
+
+Pengeluaran operasional dicatat secara bebas (tanpa kategori wajib) lewat layar
+Pengeluaran. `ReportService` dan `DashboardService` otomatis mengakumulasi data 
+ini berdasarkan rentang tanggal yang dipilih, lalu memotongnya dari Laba Kotor 
+(Gross Profit) untuk menghasilkan Laba Bersih (Net Profit).
+
 ---
 
 ## 3. Frontend
@@ -167,6 +174,7 @@ tab yang menumpuk beberapa entitas dalam satu layar.
 | Resep | `/recipes` | `RecipeController` | `pages/recipes/index.tsx` |
 | Bahan baku | `/inventory` | `InventoryController` | `pages/inventory/index.tsx` |
 | Pelanggan | `/customers` | `CustomerController` | `pages/customers/index.tsx` |
+| Pengeluaran | `/expenses` | `ExpenseController` | `pages/expenses/index.tsx` |
 | Pengguna | `/users` | `UserController` | `pages/users/index.tsx` |
 
 Semua layar tersebut memakai pola yang sama: `PageHeader` → `Panel` →
