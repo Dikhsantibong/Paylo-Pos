@@ -155,7 +155,7 @@ export default function PosIndex({
         <>
             <Head title="Kasir" />
 
-            <div className="flex h-[calc(100vh-4rem)] min-h-0 flex-col lg:flex-row">
+            <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col md:flex-row">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <ProductGrid
                         products={products}
@@ -168,7 +168,7 @@ export default function PosIndex({
                     />
                 </div>
 
-                <div className="min-h-0 w-full shrink-0 lg:h-full lg:w-[380px] xl:w-[420px]">
+                <div className="min-h-0 w-full shrink-0 md:h-full md:w-[300px] lg:w-[380px] xl:w-[420px]">
                     <CartPanel
                         items={cart.items}
                         totals={cart.totals}

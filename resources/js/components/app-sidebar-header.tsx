@@ -47,7 +47,7 @@ export function AppSidebarHeader({
             </div>
 
             <div className="flex items-center gap-3">
-                <div className="hidden items-center gap-2 text-xs leading-5 text-muted-foreground lg:flex">
+                <div className="hidden items-center gap-2 text-xs leading-5 text-muted-foreground md:flex">
                     <Clock className="size-3.5" aria-hidden />
                     <span className="tabular font-medium text-foreground">
                         {time}
