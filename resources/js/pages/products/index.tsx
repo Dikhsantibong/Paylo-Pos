@@ -23,6 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -477,15 +478,13 @@ export default function ProductsIndex({ products, categories }: Props) {
                             htmlFor="product-price"
                             error={form.errors.base_price}
                         >
-                            <Input
+                            <CurrencyInput
                                 id="product-price"
-                                type="number"
-                                min={0}
                                 value={form.data.base_price}
-                                onChange={(e) =>
+                                onChange={(val) =>
                                     form.setData(
                                         'base_price',
-                                        Number(e.target.value) || 0,
+                                        Number(val) || 0,
                                     )
                                 }
                                 required

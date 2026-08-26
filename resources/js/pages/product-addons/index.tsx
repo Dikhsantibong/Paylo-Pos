@@ -23,6 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Input } from '@/components/ui/input';
 import { number, rupiah } from '@/lib/format';
 import type { ProductAddon } from '@/types';
@@ -233,15 +234,13 @@ export default function ProductAddonsIndex({ addons, featureEnabled }: Props) {
                             htmlFor="addon-price"
                             error={form.errors.price}
                         >
-                            <Input
+                            <CurrencyInput
                                 id="addon-price"
-                                type="number"
-                                min={0}
                                 value={form.data.price}
-                                onChange={(e) =>
+                                onChange={(val) =>
                                     form.setData(
                                         'price',
-                                        Number(e.target.value) || 0,
+                                        Number(val) || 0,
                                     )
                                 }
                                 required

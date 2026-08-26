@@ -28,6 +28,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -475,13 +476,12 @@ export default function InventoryIndex({ ingredients }: Props) {
                             label="Harga per satuan (Rp)"
                             error={createForm.errors.cost_per_unit}
                         >
-                            <Input
-                                type="number"
+                            <CurrencyInput
                                 value={createForm.data.cost_per_unit}
-                                onChange={(e) =>
+                                onChange={(val) =>
                                     createForm.setData(
                                         'cost_per_unit',
-                                        Number(e.target.value),
+                                        Number(val),
                                     )
                                 }
                                 className="tabular"
@@ -593,13 +593,12 @@ export default function InventoryIndex({ ingredients }: Props) {
                             label="Harga per satuan (Rp)"
                             error={editForm.errors.cost_per_unit}
                         >
-                            <Input
-                                type="number"
+                            <CurrencyInput
                                 value={editForm.data.cost_per_unit}
-                                onChange={(e) =>
+                                onChange={(val) =>
                                     editForm.setData(
                                         'cost_per_unit',
-                                        Number(e.target.value),
+                                        Number(val),
                                     )
                                 }
                                 className="tabular"

@@ -16,7 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Label } from '@/components/ui/label';
 import { rupiah } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -59,9 +59,9 @@ export function PaymentDialog({
     const [method, setMethod] = useState<PaymentMethodOption | null>(
         () => methods[0] ?? null,
     );
-    const [tendered, setTendered] = useState('');
+    const [tendered, setTendered] = useState<number | ''>('');
 
-    const tenderedValue = Number(tendered.replace(/\D/g, '')) || 0;
+    const tenderedValue = tendered || 0;
     const needsTender = method?.requires_tender ?? false;
     const change = Math.max(0, tenderedValue - total);
     const shortfall = Math.max(0, total - tenderedValue);
@@ -83,7 +83,7 @@ export function PaymentDialog({
             open={open}
             onOpenChange={(next) => !next && !processing && onClose()}
         >
-            <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-md">
+            <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
                 <DialogHeader className="border-b px-5 py-4 text-left">
                     <DialogTitle className="text-lg">
                         Selesaikan pembayaran
@@ -93,7 +93,7 @@ export function PaymentDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex flex-col gap-5 px-5 py-4">
+                <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 py-4">
                     {/* Amount due */}
                     <div className="rounded-lg border bg-muted/50 px-4 py-3 text-center">
                         <p className="text-xs leading-4 font-semibold tracking-wide text-muted-foreground uppercase">
@@ -160,19 +160,11 @@ export function PaymentDialog({
                                 >
                                     Uang diterima
                                 </Label>
-                                <Input
+                                <CurrencyInput
                                     id="tendered"
                                     autoFocus
-                                    inputMode="numeric"
                                     value={tendered}
-                                    onChange={(event) =>
-                                        setTendered(
-                                            event.target.value.replace(
-                                                /\D/g,
-                                                '',
-                                            ),
-                                        )
-                                    }
+                                    onChange={setTendered}
                                     onKeyDown={(event) =>
                                         event.key === 'Enter' && confirm()
                                     }
@@ -186,7 +178,7 @@ export function PaymentDialog({
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => setTendered(String(total))}
+                                    onClick={() => setTendered(total)}
                                 >
                                     Pas
                                 </Button>
@@ -197,9 +189,7 @@ export function PaymentDialog({
                                         variant="outline"
                                         size="sm"
                                         className="tabular"
-                                        onClick={() =>
-                                            setTendered(String(amount))
-                                        }
+                                        onClick={() => setTendered(amount)}
                                     >
                                         {compact(amount)}
                                     </Button>
@@ -252,7 +242,7 @@ export function PaymentDialog({
                     )}
                 </div>
 
-                <DialogFooter className="gap-2 border-t px-5 py-4 sm:justify-between">
+                <DialogFooter className="pwa-safe-bottom gap-2 border-t px-5 py-4 sm:justify-between">
                     <Button
                         type="button"
                         variant="outline"

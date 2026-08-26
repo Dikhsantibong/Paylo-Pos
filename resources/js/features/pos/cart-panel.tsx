@@ -1,6 +1,7 @@
 import { Minus, Plus, ShoppingCart, Trash2, UserRound, X } from 'lucide-react';
 import { EmptyState, StatusBadge } from '@/components/paylo';
 import { Button } from '@/components/ui/button';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -277,22 +278,10 @@ export function CartPanel({
                                 >
                                     Diskon (Rp)
                                 </Label>
-                                <Input
+                                <CurrencyInput
                                     id="cart-discount"
-                                    inputMode="numeric"
-                                    value={
-                                        discount === 0 ? '' : String(discount)
-                                    }
-                                    onChange={(event) =>
-                                        onDiscountChange(
-                                            Number(
-                                                event.target.value.replace(
-                                                    /\D/g,
-                                                    '',
-                                                ),
-                                            ) || 0,
-                                        )
-                                    }
+                                    value={discount === 0 ? '' : discount}
+                                    onChange={(val) => onDiscountChange(Number(val))}
                                     placeholder="0"
                                     className="tabular h-10"
                                 />
