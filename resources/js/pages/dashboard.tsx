@@ -155,7 +155,7 @@ export default function Dashboard({
         <>
             <Head title="Dashboard" />
 
-            <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Dashboard"
                     description={`${brand?.name ?? 'Paylo'} · ${today}`}

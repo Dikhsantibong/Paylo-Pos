@@ -105,7 +105,7 @@ export default function UsersIndex({ users, roles }: Props) {
         <>
             <Head title="Pengguna" />
 
-            <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     icon={UserCog}
                     title="Pengguna"

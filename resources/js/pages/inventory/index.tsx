@@ -132,7 +132,7 @@ export default function InventoryIndex({ ingredients }: Props) {
         <>
             <Head title="Inventori" />
 
-            <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     icon={Warehouse}
                     title="Inventori"

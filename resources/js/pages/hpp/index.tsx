@@ -110,7 +110,7 @@ export default function HppIndex({ products, summary, ingredients }: Props) {
         <>
             <Head title="HPP & margin" />
 
-            <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     icon={Calculator}
                     title="HPP & margin"

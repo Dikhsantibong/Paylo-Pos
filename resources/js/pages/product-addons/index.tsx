@@ -92,7 +92,7 @@ export default function ProductAddonsIndex({ addons, featureEnabled }: Props) {
         <>
             <Head title="Add-on" />
 
-            <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     icon={PlusCircle}
                     title="Add-on"

@@ -173,7 +173,7 @@ export default function ProductsIndex({ products, categories }: Props) {
         <>
             <Head title="Produk" />
 
-            <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     icon={Package}
                     title="Produk"

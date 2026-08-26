@@ -134,7 +134,7 @@ export default function SettingsPosIndex({ settings, logoUrl }: Props) {
 
             <form
                 onSubmit={submit}
-                className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 p-4 md:p-6 lg:p-8"
+                className="flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8"
             >
                 <PageHeader
                     icon={SettingsIcon}
