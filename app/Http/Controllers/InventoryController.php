@@ -10,8 +10,10 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        $ingredients = Ingredient::orderBy('name')->get()->map(function ($ingredient) {
+        $ingredients = Ingredient::with('recipes.product')->orderBy('name')->get()->map(function ($ingredient) {
             $ingredient->is_low_stock = $ingredient->isLowStock();
+            $ingredient->used_in = $ingredient->recipes->pluck('product.name')->filter()->unique()->values()->all();
+            unset($ingredient->recipes);
 
             return $ingredient;
         });

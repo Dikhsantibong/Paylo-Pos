@@ -225,6 +225,7 @@ export default function InventoryIndex({ ingredients }: Props) {
                                     <Th numeric>Stok</Th>
                                     <Th numeric>Minimum</Th>
                                     <Th className="w-32">Level</Th>
+                                    <Th>Digunakan di</Th>
                                     <Th numeric>Harga / satuan</Th>
                                     <Th numeric>Nilai stok</Th>
                                     <Th className="w-40 text-right">Aksi</Th>
@@ -297,6 +298,22 @@ export default function InventoryIndex({ ingredients }: Props) {
                                                         }}
                                                     />
                                                 </span>
+                                            </Td>
+                                            <Td>
+                                                {ingredient.used_in?.length ? (
+                                                    <div className="flex max-w-[200px] flex-wrap gap-1">
+                                                        {ingredient.used_in.map((productName) => (
+                                                            <span
+                                                                key={productName}
+                                                                className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground"
+                                                            >
+                                                                {productName}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">—</span>
+                                                )}
                                             </Td>
                                             <Td numeric>
                                                 {rupiah(

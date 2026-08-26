@@ -139,6 +139,7 @@ export type Ingredient = {
     min_stock: number;
     cost_per_unit: number;
     is_low_stock?: boolean;
+    used_in?: string[];
 };
 
 export type IngredientEntry = {

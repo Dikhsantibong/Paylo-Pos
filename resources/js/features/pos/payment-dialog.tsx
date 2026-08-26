@@ -165,6 +165,12 @@ export function PaymentDialog({
                                     autoFocus
                                     value={tendered}
                                     onChange={setTendered}
+                                    onFocus={(e) => {
+                                        // Delay slightly to allow keyboard to pop up before scrolling
+                                        setTimeout(() => {
+                                            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        }, 300);
+                                    }}
                                     onKeyDown={(event) =>
                                         event.key === 'Enter' && confirm()
                                     }
@@ -242,7 +248,7 @@ export function PaymentDialog({
                     )}
                 </div>
 
-                <DialogFooter className="pwa-safe-bottom gap-2 border-t px-5 py-4 sm:justify-between">
+                <DialogFooter className="gap-2 border-t px-5 py-4 sm:justify-between" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
                     <Button
                         type="button"
                         variant="outline"
