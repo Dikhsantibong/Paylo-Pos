@@ -17,23 +17,30 @@ use Illuminate\Database\Seeder;
  */
 class IngredientSeeder extends Seeder
 {
-    /** name, unit, opening stock, minimum stock, rupiah per unit */
     private const INGREDIENTS = [
         // Kopi & susu
         ['Biji Kopi Arabica', 'gram', 5_000, 500, 150],
         ['Susu Segar', 'ml', 10_000, 2_000, 15],
         ['Susu Oat', 'ml', 3_000, 500, 45],
+        ['Susu Kental Manis', 'ml', 3_000, 500, 30],
 
         // Bubuk & pemanis
         ['Coklat Bubuk', 'gram', 3_000, 500, 80],
         ['Matcha Powder', 'gram', 1_000, 200, 200],
         ['Bubuk Taro', 'gram', 1_000, 200, 120],
+        ['Bubuk Goguma', 'gram', 1_000, 200, 150],
         ['Gula Cair', 'ml', 3_000, 500, 20],
+        ['Gula Aren', 'ml', 3_000, 500, 25],
+        ['Sea Salt', 'gram', 500, 100, 50],
 
         // Syrup
         ['Syrup Vanilla', 'ml', 2_000, 300, 40],
         ['Syrup Hazelnut', 'ml', 2_000, 300, 40],
         ['Syrup Caramel', 'ml', 2_000, 300, 40],
+        ['Syrup Pandan', 'ml', 2_000, 300, 40],
+        ['Syrup Pisang', 'ml', 2_000, 300, 40],
+        ['Syrup Butterscotch', 'ml', 2_000, 300, 45],
+        ['Syrup Strawberry', 'ml', 2_000, 300, 40],
 
         // Dasar
         ['Air Mineral', 'ml', 50_000, 10_000, 2],

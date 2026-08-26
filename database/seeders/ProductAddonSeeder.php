@@ -14,15 +14,8 @@ use Illuminate\Database\Seeder;
  */
 class ProductAddonSeeder extends Seeder
 {
-    /** name, price */
     private const ADDONS = [
-        ['Extra Shot', 5_000],
-        ['Susu Oat', 7_000],
-        ['Syrup Vanilla', 3_000],
-        ['Syrup Hazelnut', 3_000],
-        ['Syrup Caramel', 3_000],
-        ['Whipped Cream', 4_000],
-        ['Extra Es Krim', 8_000],
+        ['Extra Shoot', 3_000],
     ];
 
     public function run(): void

@@ -36,136 +36,118 @@ class ProductSeeder extends Seeder
         ['Large', 5_000],
     ];
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
     private function products(): array
     {
         return [
-            // ── Coffee ────────────────────────────────────────
+            // ── Kopi Dingin ────────────────────────────────────────
             [
-                'slug' => 'espresso', 'name' => 'Espresso', 'category' => 'coffee',
-                'price' => 18_000, 'sizes' => true,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Air Mineral' => 40],
-                'variant_recipe' => ['Large' => ['Biji Kopi Arabica' => 9]],
-            ],
-            [
-                'slug' => 'americano', 'name' => 'Americano', 'category' => 'coffee',
-                'price' => 22_000, 'sizes' => true,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Air Mineral' => 150, 'Es Batu' => 100],
-                'variant_recipe' => ['Large' => ['Air Mineral' => 60, 'Es Batu' => 40]],
-            ],
-            [
-                'slug' => 'latte', 'name' => 'Latte', 'category' => 'coffee',
-                'price' => 28_000, 'sizes' => true,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Es Batu' => 60],
-                'variant_recipe' => ['Large' => ['Susu Segar' => 50, 'Es Batu' => 20]],
-            ],
-            [
-                'slug' => 'cappuccino', 'name' => 'Cappuccino', 'category' => 'coffee',
-                'price' => 28_000, 'sizes' => true,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 120],
-            ],
-            [
-                'slug' => 'flat-white', 'name' => 'Flat White', 'category' => 'coffee',
-                'price' => 30_000, 'sizes' => true,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 100],
-            ],
-            [
-                'slug' => 'mocha', 'name' => 'Mocha', 'category' => 'coffee',
-                'price' => 32_000, 'sizes' => true,
-                'recipe' => [
-                    'Biji Kopi Arabica' => 18, 'Susu Segar' => 120,
-                    'Coklat Bubuk' => 15, 'Gula Cair' => 15,
-                ],
-            ],
-            [
-                'slug' => 'caramel-macchiato', 'name' => 'Caramel Macchiato', 'category' => 'coffee',
-                'price' => 35_000, 'sizes' => true,
-                'recipe' => [
-                    'Biji Kopi Arabica' => 18, 'Susu Segar' => 150,
-                    'Syrup Caramel' => 20, 'Es Batu' => 60,
-                ],
-            ],
-            [
-                'slug' => 'affogato', 'name' => 'Affogato', 'category' => 'coffee',
-                'price' => 30_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Biji Kopi Arabica' => 18, 'Es Krim Vanilla' => 80],
-            ],
-
-            // ── Non-Coffee ────────────────────────────────────
-            [
-                'slug' => 'matcha-latte', 'name' => 'Matcha Latte', 'category' => 'non-coffee',
-                'price' => 30_000, 'sizes' => true,
-                'recipe' => [
-                    'Matcha Powder' => 5, 'Susu Segar' => 200,
-                    'Gula Cair' => 15, 'Es Batu' => 60,
-                ],
-            ],
-            [
-                'slug' => 'taro-latte', 'name' => 'Taro Latte', 'category' => 'non-coffee',
-                'price' => 28_000, 'sizes' => true,
-                'recipe' => ['Bubuk Taro' => 25, 'Susu Segar' => 180, 'Es Batu' => 60],
-            ],
-            [
-                'slug' => 'chocolate', 'name' => 'Chocolate', 'category' => 'non-coffee',
-                'price' => 25_000, 'sizes' => true,
-                'recipe' => ['Coklat Bubuk' => 25, 'Susu Segar' => 180, 'Gula Cair' => 10],
-            ],
-            [
-                'slug' => 'iced-tea', 'name' => 'Iced Tea', 'category' => 'non-coffee',
+                'slug' => 'kopi-aren', 'name' => 'Kopi Aren', 'category' => 'kopi',
                 'price' => 15_000, 'sizes' => false, 'temperature' => false,
-                'recipe' => [
-                    'Teh Celup' => 1, 'Air Mineral' => 200,
-                    'Gula Cair' => 20, 'Es Batu' => 100,
-                ],
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Gula Aren' => 20, 'Es Batu' => 60],
             ],
             [
-                'slug' => 'lemon-tea', 'name' => 'Lemon Tea', 'category' => 'non-coffee',
-                'price' => 18_000, 'sizes' => false,
-                'recipe' => [
-                    'Teh Celup' => 1, 'Air Mineral' => 200, 'Lemon' => 0.5,
-                    'Gula Cair' => 20, 'Es Batu' => 80,
-                ],
+                'slug' => 'kopi-pandan', 'name' => 'Kopi Pandan', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Syrup Pandan' => 20, 'Es Batu' => 60],
             ],
             [
-                'slug' => 'fresh-orange', 'name' => 'Fresh Orange', 'category' => 'non-coffee',
-                'price' => 22_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Jeruk Peras' => 3, 'Es Batu' => 80],
+                'slug' => 'americano', 'name' => 'Americano', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Air Mineral' => 150, 'Es Batu' => 100],
+            ],
+            [
+                'slug' => 'kopi-pisang', 'name' => 'Kopi Pisang', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Syrup Pisang' => 20, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'kopi-caramel', 'name' => 'Kopi Caramel', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Syrup Caramel' => 20, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'es-koja', 'name' => 'Es Koja', 'category' => 'kopi',
+                'price' => 18_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Gula Aren' => 10, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'butterscotch-sea-salt', 'name' => 'Butterscotch Sea Salt', 'category' => 'kopi',
+                'price' => 18_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Syrup Butterscotch' => 20, 'Sea Salt' => 5, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'goguma-latte', 'name' => 'Goguma Latte', 'category' => 'kopi',
+                'price' => 18_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Bubuk Goguma' => 20, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'spanish-latte', 'name' => 'Spanish Latte', 'category' => 'kopi',
+                'price' => 17_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 100, 'Susu Kental Manis' => 30, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'ice-latte', 'name' => 'Ice Latte', 'category' => 'kopi',
+                'price' => 17_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Es Batu' => 60],
             ],
 
-            // ── Snack ─────────────────────────────────────────
+            // ── Kopi Panas ────────────────────────────────────────
             [
-                'slug' => 'french-fries', 'name' => 'French Fries', 'category' => 'snack',
-                'price' => 20_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Kentang Beku' => 150, 'Minyak Goreng' => 20],
+                'slug' => 'kopi-panas-koja', 'name' => 'Kopi Panas Koja', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Gula Aren' => 10],
             ],
             [
-                'slug' => 'chicken-nuggets', 'name' => 'Chicken Nuggets', 'category' => 'snack',
-                'price' => 25_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Nugget Ayam' => 120, 'Minyak Goreng' => 20],
+                'slug' => 'americano-hot', 'name' => 'Americano Hot', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Air Mineral' => 150],
             ],
             [
-                'slug' => 'banana-split', 'name' => 'Banana Split', 'category' => 'snack',
-                'price' => 22_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Pisang' => 1, 'Es Krim Vanilla' => 80, 'Whipped Cream' => 20],
+                'slug' => 'white', 'name' => 'White', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150],
+            ],
+            [
+                'slug' => 'latte-hot', 'name' => 'Latte Hot', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150],
+            ],
+            [
+                'slug' => 'aren-hot', 'name' => 'Aren Hot', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Gula Aren' => 20],
+            ],
+            [
+                'slug' => 'pandan-hot', 'name' => 'Pandan Hot', 'category' => 'kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Biji Kopi Arabica' => 18, 'Susu Segar' => 150, 'Syrup Pandan' => 20],
             ],
 
-            // ── Pastry ────────────────────────────────────────
+            // ── Non Kopi ────────────────────────────────────────
             [
-                'slug' => 'croissant', 'name' => 'Croissant', 'category' => 'pastry',
-                'price' => 18_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Croissant Beku' => 1],
+                'slug' => 'matcha', 'name' => 'Matcha', 'category' => 'non-kopi',
+                'price' => 18_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Matcha Powder' => 15, 'Susu Segar' => 150, 'Es Batu' => 60],
             ],
             [
-                'slug' => 'banana-bread', 'name' => 'Banana Bread', 'category' => 'pastry',
-                'price' => 15_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Banana Bread Slice' => 1],
+                'slug' => 'banana-milk', 'name' => 'Banana Milk', 'category' => 'non-kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Syrup Pisang' => 20, 'Susu Segar' => 150, 'Es Batu' => 60],
             ],
             [
-                'slug' => 'chocolate-cake', 'name' => 'Chocolate Cake', 'category' => 'pastry',
-                'price' => 25_000, 'sizes' => false, 'temperature' => false, 'sugar' => false,
-                'recipe' => ['Chocolate Cake Slice' => 1],
+                'slug' => 'matcha-strawberry', 'name' => 'Matcha Strawberry', 'category' => 'non-kopi',
+                'price' => 18_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Matcha Powder' => 15, 'Susu Segar' => 150, 'Syrup Strawberry' => 20, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'pandan-milk', 'name' => 'Pandan Milk', 'category' => 'non-kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Syrup Pandan' => 20, 'Susu Segar' => 150, 'Es Batu' => 60],
+            ],
+            [
+                'slug' => 'coklat-milk', 'name' => 'Coklat Milk', 'category' => 'non-kopi',
+                'price' => 15_000, 'sizes' => false, 'temperature' => false,
+                'recipe' => ['Coklat Bubuk' => 20, 'Susu Segar' => 150, 'Es Batu' => 60],
             ],
         ];
     }

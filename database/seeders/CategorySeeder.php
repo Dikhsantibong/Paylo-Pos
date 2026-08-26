@@ -15,10 +15,8 @@ use Illuminate\Database\Seeder;
 class CategorySeeder extends Seeder
 {
     private const CATEGORIES = [
-        ['slug' => 'coffee', 'name' => 'Coffee', 'sort_order' => 1],
-        ['slug' => 'non-coffee', 'name' => 'Non-Coffee', 'sort_order' => 2],
-        ['slug' => 'snack', 'name' => 'Snack', 'sort_order' => 3],
-        ['slug' => 'pastry', 'name' => 'Pastry', 'sort_order' => 4],
+        ['slug' => 'kopi', 'name' => 'Kopi', 'sort_order' => 1],
+        ['slug' => 'non-kopi', 'name' => 'Non Kopi', 'sort_order' => 2],
     ];
 
     public function run(): void
