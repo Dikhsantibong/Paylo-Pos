@@ -1,0 +1,66 @@
+{
+    "id": "/?source=pwa",
+    "name": "Paylo — Point of Sale",
+    "short_name": "Paylo",
+    "description": "Kasir, inventori, HPP, dan laporan penjualan untuk coffee shop.",
+    "start_url": "/?source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+    "orientation": "any",
+    "background_color": "#f9fafb",
+    "theme_color": "#2563eb",
+    "lang": "id",
+    "dir": "ltr",
+    "categories": ["business", "finance", "productivity"],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Buka kasir",
+            "short_name": "Kasir",
+            "description": "Langsung ke layar transaksi",
+            "url": "/pos",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Ringkasan penjualan hari ini",
+            "url": "/dashboard",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Laporan",
+            "short_name": "Laporan",
+            "description": "Laporan penjualan dan laba",
+            "url": "/reports",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        }
+    ]
+}
