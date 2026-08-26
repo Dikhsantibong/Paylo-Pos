@@ -127,6 +127,10 @@ Aturan mainnya:
 - Halaman menyusun komponen `@/components/paylo`, bukan mendandani ulang
   primitif `ui/`.
 - Layar yang kompleks dipecah ke `features/<nama>/` seperti `features/pos`.
+- **Struk Kasir:** Komponen `features/pos/receipt-dialog.tsx` telah disesuaikan
+  untuk memuat identitas toko di bagian header secara tebal (bold/uppercase) dan
+  menyematkan keterangan lisensi aplikasi ("Powered by Paylo - Aplikasi Kasir 
+  Sulawesi Tenggara") di bagian footer.
 
 Referensi visual lengkap ada di [`design.md`](../design.md).
 
@@ -158,6 +162,23 @@ Dua sifat penting:
 Menambah menu bawaan cukup menambahkan satu entri di `ProductSeeder::products()`;
 `recipe` berlaku untuk semua penjualan, `variant_recipe` ditambahkan khusus untuk
 varian tersebut.
+
+---
+
+### Kasir (POS)
+
+**Rute Transaksi:**
+- `GET /pos`: Layar kasir utama (pilih produk).
+- `POST /pos/checkout`: Memproses pesanan, mengurangi stok via `CheckoutService`.
+
+### Inventori & Bahan Baku
+
+- `GET /inventory`: Menampilkan daftar bahan, stok, peringatan stok menipis, HPP.
+- `POST /inventory`: Menambah bahan baku baru.
+- `PUT /inventory/{ingredient}`: Mengubah konfigurasi bahan (nama, satuan, HPP).
+- `DELETE /inventory/{ingredient}`: Menghapus bahan baku. Dilarang/diblokir (Safe Delete) jika bahan masih digunakan dalam suatu resep produk.
+- `POST /inventory/{ingredient}/adjust-stock`: Melakukan penyesuaian stok manual. Mendukung `type: 'in'` (Barang Masuk / Pembelian) dan `type: 'out'` (Barang Keluar / Terbuang, Basi). Ini akan menghasilkan `ingredient_entries` agar memiliki *audit trail* stok.
+- `GET /inventory/{ingredient}/history`: Mengambil riwayat mutasi stok.
 
 ---
 

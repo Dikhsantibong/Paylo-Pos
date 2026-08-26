@@ -64,7 +64,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
         Route::post('inventory', [InventoryController::class, 'store'])->name('inventory.store');
         Route::put('inventory/{ingredient}', [InventoryController::class, 'update'])->name('inventory.update');
-        Route::post('inventory/{ingredient}/add-stock', [InventoryController::class, 'addStock'])->name('inventory.add-stock');
+        Route::delete('inventory/{ingredient}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
+        Route::post('inventory/{ingredient}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock');
         Route::get('inventory/{ingredient}/history', [InventoryController::class, 'history'])->name('inventory.history');
 
         // Expenses

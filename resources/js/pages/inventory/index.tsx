@@ -6,6 +6,7 @@ import {
     Plus,
     Search,
     Warehouse,
+    Trash2,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import {
@@ -56,8 +57,11 @@ export default function InventoryIndex({ ingredients }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editing, setEditing] = useState<Ingredient | null>(null);
     const [restocking, setRestocking] = useState<Ingredient | null>(null);
+    const [deleting, setDeleting] = useState<Ingredient | null>(null);
     const [status, setStatus] = useState<'all' | 'low' | 'normal'>('all');
     const [query, setQuery] = useState('');
+
+    const deleteForm = useForm({});
 
     const createForm = useForm({
         name: '',
@@ -72,7 +76,7 @@ export default function InventoryIndex({ ingredients }: Props) {
         min_stock: 0,
         cost_per_unit: 0,
     });
-    const stockForm = useForm({ quantity: 0, notes: '' });
+    const stockForm = useForm({ type: 'in', quantity: 0, notes: '' });
 
     const visible = useMemo(() => {
         const needle = query.trim().toLowerCase();
@@ -120,7 +124,8 @@ export default function InventoryIndex({ ingredients }: Props) {
 
     const openRestock = (ingredient: Ingredient) => {
         setRestocking(ingredient);
-        stockForm.reset();
+        stockForm.setData({ type: 'in', quantity: 0, notes: '' });
+        stockForm.clearErrors();
     };
 
     return (
@@ -332,6 +337,20 @@ export default function InventoryIndex({ ingredients }: Props) {
                                                         aria-label={`Ubah ${ingredient.name}`}
                                                     >
                                                         <Pencil
+                                                            className="size-4"
+                                                            aria-hidden
+                                                        />
+                                                    </Button>
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                        onClick={() =>
+                                                            setDeleting(ingredient)
+                                                        }
+                                                        aria-label={`Hapus ${ingredient.name}`}
+                                                    >
+                                                        <Trash2
                                                             className="size-4"
                                                             aria-hidden
                                                         />
@@ -626,7 +645,7 @@ export default function InventoryIndex({ ingredients }: Props) {
                 </DialogContent>
             </Dialog>
 
-            {/* Restock */}
+            {/* Adjust Stock */}
             <Dialog
                 open={restocking !== null}
                 onOpenChange={(open) => !open && setRestocking(null)}
@@ -634,7 +653,7 @@ export default function InventoryIndex({ ingredients }: Props) {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>
-                            Tambah stok {restocking?.name}
+                            Penyesuaian stok {restocking?.name}
                         </DialogTitle>
                         <DialogDescription>
                             Stok saat ini{' '}
@@ -657,7 +676,7 @@ export default function InventoryIndex({ ingredients }: Props) {
                             }
 
                             stockForm.post(
-                                `/inventory/${restocking.id}/add-stock`,
+                                `/inventory/${restocking.id}/adjust-stock`,
                                 {
                                     preserveScroll: true,
                                     onSuccess: () => setRestocking(null),
@@ -666,29 +685,51 @@ export default function InventoryIndex({ ingredients }: Props) {
                         }}
                         className="flex flex-col gap-4"
                     >
-                        <Field
-                            label={`Jumlah masuk (${restocking?.unit ?? ''})`}
-                            error={stockForm.errors.quantity}
-                        >
-                            <Input
-                                type="number"
-                                step="0.01"
-                                value={stockForm.data.quantity}
-                                onChange={(e) =>
-                                    stockForm.setData(
-                                        'quantity',
-                                        Number(e.target.value),
-                                    )
-                                }
-                                required
-                                autoFocus
-                                className="tabular"
-                            />
-                        </Field>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Field
+                                label="Jenis"
+                                error={stockForm.errors.type}
+                            >
+                                <Select
+                                    value={stockForm.data.type}
+                                    onValueChange={(v) =>
+                                        stockForm.setData('type', v)
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="in">Barang Masuk</SelectItem>
+                                        <SelectItem value="out">Barang Keluar</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+
+                            <Field
+                                label={`Jumlah (${restocking?.unit ?? ''})`}
+                                error={stockForm.errors.quantity}
+                            >
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={stockForm.data.quantity || ''}
+                                    onChange={(e) =>
+                                        stockForm.setData(
+                                            'quantity',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                    required
+                                    autoFocus
+                                    className="tabular"
+                                />
+                            </Field>
+                        </div>
 
                         <Field
                             label="Catatan"
-                            help="Misalnya nomor nota atau nama pemasok."
+                            help={stockForm.data.type === 'in' ? "Misalnya nomor nota atau nama pemasok." : "Misalnya tumpah, basi, atau terbuang."}
                             error={stockForm.errors.notes}
                         >
                             <Textarea
@@ -715,10 +756,49 @@ export default function InventoryIndex({ ingredients }: Props) {
                             >
                                 {stockForm.processing
                                     ? 'Menyimpan…'
-                                    : 'Tambah stok'}
+                                    : 'Simpan stok'}
                             </Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete */}
+            <Dialog
+                open={deleting !== null}
+                onOpenChange={(open) => !open && setDeleting(null)}
+            >
+                <DialogContent className="sm:max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Hapus bahan baku?</DialogTitle>
+                        <DialogDescription>
+                            Bahan baku <strong className="text-foreground">{deleting?.name}</strong> akan dihapus permanen. 
+                            Bahan ini tidak bisa dihapus jika sedang digunakan dalam resep.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter className="gap-2 sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setDeleting(null)}
+                        >
+                            Batal
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={deleteForm.processing}
+                            onClick={() => {
+                                deleteForm.delete(`/inventory/${deleting?.id}`, {
+                                    preserveScroll: true,
+                                    onSuccess: () => setDeleting(null),
+                                });
+                            }}
+                        >
+                            Hapus
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>

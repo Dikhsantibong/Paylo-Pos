@@ -66,17 +66,17 @@ export function ReceiptDialog({
                     id="paylo-receipt"
                     className="max-h-[58vh] overflow-y-auto px-5 py-4 text-sm"
                 >
-                    <header className="border-b border-dashed pb-3 text-center">
-                        <p className="text-base leading-6 font-bold">
+                    <div className="border-b border-dashed pb-4 pt-2 text-center">
+                        <h1 className="text-lg leading-tight font-black uppercase tracking-wider text-foreground">
                             {receipt.shop.name}
-                        </p>
+                        </h1>
                         {receipt.shop.tagline && (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="mt-0.5 text-xs text-muted-foreground">
                                 {receipt.shop.tagline}
                             </p>
                         )}
                         {receipt.shop.address && (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="mt-1 text-xs text-muted-foreground">
                                 {receipt.shop.address}
                             </p>
                         )}
@@ -86,17 +86,17 @@ export function ReceiptDialog({
                             </p>
                         )}
 
-                        <p className="tabular mt-2 text-xs text-muted-foreground">
-                            {receipt.number}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            {issued}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            Kasir {receipt.cashier ?? '—'}
-                            {receipt.customer ? ` · ${receipt.customer}` : ''}
-                        </p>
-                    </header>
+                        <div className="mt-3 flex flex-col gap-0.5 border-t border-dashed pt-3 text-xs text-muted-foreground">
+                            <p className="tabular text-foreground/80 font-medium">
+                                {receipt.number}
+                            </p>
+                            <p>{issued}</p>
+                            <p>
+                                Kasir {receipt.cashier ?? '—'}
+                                {receipt.customer ? ` · ${receipt.customer}` : ''}
+                            </p>
+                        </div>
+                    </div>
 
                     <ul className="flex flex-col gap-2.5 border-b border-dashed py-3">
                         {receipt.items.map((item, index) => (
@@ -185,17 +185,28 @@ export function ReceiptDialog({
                         )}
                     </dl>
 
-                    {receipt.notes && (
-                        <p className="border-t border-dashed pt-3 text-xs text-muted-foreground italic">
-                            Catatan: {receipt.notes}
-                        </p>
-                    )}
+                    <div className="border-t border-dashed pt-4 pb-2 text-center">
+                        {receipt.notes && (
+                            <p className="mb-2 text-xs text-muted-foreground italic">
+                                Catatan: {receipt.notes}
+                            </p>
+                        )}
+                        
+                        {receipt.footer && (
+                            <p className="mb-4 text-xs text-muted-foreground">
+                                {receipt.footer}
+                            </p>
+                        )}
 
-                    {receipt.footer && (
-                        <p className="border-t border-dashed pt-3 text-center text-xs text-muted-foreground">
-                            {receipt.footer}
-                        </p>
-                    )}
+                        <div className="mx-auto mt-2 max-w-[250px]">
+                            <p className="text-xs font-bold text-foreground/70">
+                                Powered by Paylo
+                            </p>
+                            <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">
+                                Dari Kendari, Untuk Indonesia
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <DialogFooter className="gap-2 border-t px-5 py-4 sm:justify-between print:hidden">

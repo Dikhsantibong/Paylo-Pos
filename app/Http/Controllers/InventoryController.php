@@ -56,22 +56,34 @@ class InventoryController extends Controller
         ]);
     }
 
-    public function addStock(Request $request, Ingredient $ingredient)
+    public function adjustStock(Request $request, Ingredient $ingredient)
     {
         $validated = $request->validate([
+            'type' => 'required|in:in,out',
             'quantity' => 'required|numeric|min:0.01',
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $ingredient->addStock(
-            $validated['quantity'],
-            $request->user()->id,
-            $validated['notes']
-        );
+        if ($validated['type'] === 'in') {
+            $ingredient->addStock(
+                $validated['quantity'],
+                $request->user()->id,
+                $validated['notes']
+            );
+        } else {
+            $ingredient->deductStock(
+                $validated['quantity'],
+                $request->user()->id,
+                'manual',
+                null
+            );
+        }
+
+        $action = $validated['type'] === 'in' ? 'ditambahkan' : 'dikurangi';
 
         return back()->with('flash', [
             'type' => 'success',
-            'message' => "Stok {$ingredient->name} berhasil ditambahkan.",
+            'message' => "Stok {$ingredient->name} berhasil {$action}.",
         ]);
     }
 
@@ -86,6 +98,23 @@ class InventoryController extends Controller
         return response()->json([
             'ingredient' => $ingredient,
             'entries' => $entries,
+        ]);
+    }
+
+    public function destroy(Ingredient $ingredient)
+    {
+        if ($ingredient->recipes()->exists()) {
+            return back()->with('flash', [
+                'type' => 'error',
+                'message' => "Tidak bisa dihapus karena bahan {$ingredient->name} sedang digunakan dalam resep.",
+            ]);
+        }
+
+        $ingredient->delete();
+
+        return back()->with('flash', [
+            'type' => 'success',
+            'message' => "Bahan {$ingredient->name} berhasil dihapus.",
         ]);
     }
 }
