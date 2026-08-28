@@ -12,7 +12,7 @@ class RuzzCoffeeSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('Seeding data untuk Ruzz Coffee...');
+        $this->command->info('Seeding data untuk Ruzz Coffee (Updated)...');
 
         // 1. Kategori
         $categoriesData = [
@@ -29,20 +29,24 @@ class RuzzCoffeeSeeder extends Seeder
         $categories = Category::query()->pluck('id', 'slug');
 
         // 2. Bahan Baku
+        // Harga dan satuan disesuaikan dengan instruksi:
+        // biji kopi 2KG (2000g) / 360rb => 180 / gram
+        // cup 500pcs / 625rb => 1250 / pcs
+        // sirup 8 BTL 1000ml (8000ml total, each 1000ml) / 960rb => 120 / ml
+        // jus orange 1BTL 1LT (1000ml) / 35rb => 35 / ml
+        // matcha 800GR / 190rb => 238 / gram (pembulatan)
+        // dark coco 1KG (1000g) / 65rb => 65 / gram
+        // uht 12botol 1000ML (12000ml) / 250rb => 21 / ml (pembulatan)
+        // teh sari wangi 2BOX 40pcs (80pcs) / 30rb => 375 / pcs
+        // creamer 1box 1KG (1000g) / 57rb => 57 / gram (Satuan beli KG = gram)
+        // pipet 1 box 500pcs / 37rb => 74 / pcs
+        // gula cair 5LT (5000ml) / 73rb => 15 / ml (pembulatan)
+        // es batu 1 BOX / 15rb => Kita asumsikan 15000 gram => 1 / gram
+        // SKM 2pcs 2KG (4000g) / 52rb => 13 / gram (Satuan beli KG = gram)
+        // GALON 1 50LT (50000ml) / 6rb => 1 / ml
         $ingredientsData = [
             ['Biji Kopi Arabica', 'gram', 2000, 500, 180],
             ['Cup', 'pcs', 500, 50, 1250],
-            ['Pipet', 'pcs', 500, 50, 74],
-            ['Susu UHT', 'ml', 12000, 1000, 21],
-            ['Matcha Powder', 'gram', 800, 200, 238],
-            ['Dark Coco', 'gram', 1000, 200, 65],
-            ['Creamer', 'gram', 1000, 200, 57],
-            ['Susu Kental Manis (SKM)', 'gram', 4000, 500, 13],
-            ['Gula Cair', 'ml', 5000, 500, 15],
-            ['Es Batu', 'gram', 15000, 2000, 1],
-            ['Jus Orange', 'ml', 1000, 200, 35],
-            ['Teh Sari Wangi', 'pcs', 80, 10, 375],
-            ['Air Galon', 'ml', 50000, 5000, 1],
             ['Sirup Pandan', 'ml', 1000, 200, 120],
             ['Sirup Aren', 'ml', 1000, 200, 120],
             ['Sirup Caramel', 'ml', 1000, 200, 120],
@@ -51,6 +55,17 @@ class RuzzCoffeeSeeder extends Seeder
             ['Sirup Peach', 'ml', 1000, 200, 120],
             ['Sirup Lychee', 'ml', 1000, 200, 120],
             ['Sirup Lemon', 'ml', 1000, 200, 120],
+            ['Jus Orange', 'ml', 1000, 200, 35],
+            ['Matcha Powder', 'gram', 800, 200, 238],
+            ['Dark Coco', 'gram', 1000, 200, 65],
+            ['Susu UHT', 'ml', 12000, 1000, 21],
+            ['Teh Sari Wangi', 'pcs', 80, 10, 375],
+            ['Creamer', 'gram', 1000, 200, 57],
+            ['Pipet', 'pcs', 500, 50, 74],
+            ['Gula Cair', 'ml', 5000, 500, 15],
+            ['Es Batu', 'gram', 15000, 2000, 1],
+            ['Susu Kental Manis (SKM)', 'gram', 4000, 500, 13],
+            ['Air Galon', 'ml', 50000, 5000, 1],
         ];
 
         foreach ($ingredientsData as [$name, $unit, $stock, $minStock, $cost]) {
@@ -84,7 +99,7 @@ class RuzzCoffeeSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Coffe Aren',
+                'name' => 'Coffee Aren',
                 'category' => 'coffee',
                 'price' => 15000,
                 'recipe' => [
@@ -152,7 +167,6 @@ class RuzzCoffeeSeeder extends Seeder
                     'Susu Kental Manis (SKM)' => 20,
                     'Creamer' => 20,
                     'Susu UHT' => 60,
-                    'Es Batu' => 100,
                     'Cup' => 1,
                     'Pipet' => 1,
                 ]
@@ -205,7 +219,7 @@ class RuzzCoffeeSeeder extends Seeder
                     'Sirup Lychee' => 17,
                     'Gula Cair' => 10,
                     'Teh Sari Wangi' => 1,
-                    'Air Galon' => 60,
+                    'Air Galon' => 60, // merepresentasikan seduhan 60ml teh
                     'Es Batu' => 100,
                     'Cup' => 1,
                     'Pipet' => 1,
@@ -219,7 +233,7 @@ class RuzzCoffeeSeeder extends Seeder
                     'Sirup Lemon' => 17,
                     'Gula Cair' => 10,
                     'Teh Sari Wangi' => 1,
-                    'Air Galon' => 60,
+                    'Air Galon' => 60, // merepresentasikan seduhan 60ml teh
                     'Es Batu' => 100,
                     'Cup' => 1,
                     'Pipet' => 1,
