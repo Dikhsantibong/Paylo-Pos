@@ -30,10 +30,7 @@ class StarterDataSeeder extends Seeder
         $this->call([
             SettingsSeeder::class,
             UserSeeder::class,
-            CategorySeeder::class,
-            IngredientSeeder::class,
-            ProductAddonSeeder::class,
-            ProductSeeder::class,
+            RuzzCoffeeSeeder::class,
         ]);
 
         $this->command?->newLine();
