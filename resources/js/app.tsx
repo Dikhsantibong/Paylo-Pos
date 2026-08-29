@@ -35,5 +35,15 @@ createInertiaApp({
     },
 });
 
+import { router } from '@inertiajs/react';
+
 // This will set light / dark mode on load...
 initializeTheme();
+
+router.on('exception', (event) => {
+    // Suppress network error modals
+    if (event.detail.exception.message === 'Network Error' || !navigator.onLine) {
+        event.preventDefault();
+        console.warn('Network error suppressed to prevent JSON modal.');
+    }
+});
