@@ -5,11 +5,14 @@ export {
     BROWSER_FALLBACK,
     configure,
     connect,
+    connectToNative,
     DEFAULT_SETTINGS,
     diagnostics,
     disconnect,
     effectiveTransport,
     getState,
+    nativeAvailable,
+    nativeDevices,
     printReceipt,
     printTestPage,
     restore,
@@ -23,5 +26,6 @@ export {
     type TransportChoice,
 } from './manager';
 export { renderReceipt, renderTestPage, type RenderOptions } from './receipt';
+export { bluetoothProbe, type BluetoothProbe } from './transport-bluetooth';
 export { RAWBT_PLAY_URL } from './transport-rawbt';
 export { PrintError, type PrinterDevice, type TransportId } from './types';

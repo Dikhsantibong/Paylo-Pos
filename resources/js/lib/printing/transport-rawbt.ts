@@ -60,9 +60,9 @@ function handOff(url: string): void {
 
 export const rawbtTransport: Transport = {
     id: 'rawbt',
-    label: 'RawBT (Bluetooth Classic)',
+    label: 'RawBT (aplikasi pihak ketiga)',
     description:
-        'Untuk printer Bluetooth biasa (SPP) yang sudah dipasangkan di Android. Paylo mengirim ESC/POS ke aplikasi RawBT — tanpa dialog cetak.',
+        'Jalan pintas lama: Paylo menitipkan ESC/POS ke aplikasi RawBT. Butuh aplikasi terpisah dengan lisensinya sendiri — pakai hanya kalau jalur mandiri di atas tidak memungkinkan.',
 
     support(): TransportSupport {
         if (!isAndroid()) {

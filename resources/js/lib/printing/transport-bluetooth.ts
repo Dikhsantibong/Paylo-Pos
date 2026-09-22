@@ -105,6 +105,25 @@ let characteristic: GattCharacteristic | null = null;
 let chunkSize = CHUNK_LARGE;
 let lostHandler: (() => void) | null = null;
 
+/**
+ * What the last connection attempt actually found on the device. The settings
+ * screen shows this, because it answers the one question that decides which
+ * route a shop has to take: does this printer speak BLE at all, or is it
+ * Classic-only?
+ */
+export type BluetoothProbe = {
+    deviceName: string;
+    services: string[];
+    writable: number;
+    characteristic: string | null;
+};
+
+let probe: BluetoothProbe | null = null;
+
+export function bluetoothProbe(): BluetoothProbe | null {
+    return probe;
+}
+
 function describe(d: BleDevice): PrinterDevice {
     return {
         id: d.id,
@@ -116,9 +135,17 @@ function describe(d: BleDevice): PrinterDevice {
 /** Walk every service on the device and pick something writable. */
 async function findWriteCharacteristic(
     server: GattServer,
+    deviceName: string,
 ): Promise<GattCharacteristic> {
     const services = await server.getPrimaryServices();
     const writable: GattCharacteristic[] = [];
+
+    probe = {
+        deviceName,
+        services: services.map((service) => service.uuid),
+        writable: 0,
+        characteristic: null,
+    };
 
     for (const service of services) {
         let characteristics: GattCharacteristic[] = [];
@@ -140,10 +167,12 @@ async function findWriteCharacteristic(
         }
     }
 
+    probe.writable = writable.length;
+
     if (writable.length === 0) {
         throw new PrintError(
-            'Perangkat terhubung tapi tidak punya jalur tulis BLE.',
-            'Printer ini kemungkinan hanya mendukung Bluetooth Classic (SPP), yang tidak bisa dibuka dari browser. Pindah ke mode RawBT.',
+            'Printer ini tidak punya jalur tulis BLE.',
+            'Berarti printernya Bluetooth Classic (SPP) saja. Browser tidak bisa membukanya sama sekali — jalankan Paylo sebagai aplikasi Android sendiri (lihat panduan di bawah), atau sambungkan printer lewat USB OTG.',
         );
     }
 
@@ -151,7 +180,11 @@ async function findWriteCharacteristic(
         PREFERRED_CHARACTERISTICS.includes(candidate.uuid.toLowerCase()),
     );
 
-    return preferred ?? writable[0];
+    const chosen = preferred ?? writable[0];
+
+    probe.characteristic = chosen.uuid;
+
+    return chosen;
 }
 
 async function open(target: BleDevice): Promise<PrinterDevice> {
@@ -163,7 +196,10 @@ async function open(target: BleDevice): Promise<PrinterDevice> {
         ? target.gatt
         : await target.gatt.connect();
 
-    characteristic = await findWriteCharacteristic(server);
+    characteristic = await findWriteCharacteristic(
+        server,
+        target.name?.trim() || 'Printer Bluetooth',
+    );
     chunkSize = CHUNK_LARGE;
 
     if (device !== target) {

@@ -1,6 +1,12 @@
 /** Shared shapes for the printing transports. */
 
-export type TransportId = 'bluetooth' | 'usb' | 'serial' | 'rawbt' | 'browser';
+export type TransportId =
+    | 'native'
+    | 'bluetooth'
+    | 'usb'
+    | 'serial'
+    | 'rawbt'
+    | 'browser';
 
 export type PrinterDevice = {
     /** Stable per-browser identifier, used to reconnect without a prompt. */
@@ -38,6 +44,14 @@ export type Transport = {
     write(bytes: Uint8Array): Promise<void>;
     /** Called when the printer drops the link on its own. */
     onLost(handler: () => void): void;
+
+    /**
+     * Transports that can enumerate devices themselves instead of relying on
+     * a browser chooser — the native shell lists the printers Android has
+     * already paired. Paylo renders that list and calls `connectTo`.
+     */
+    list?(): Promise<PrinterDevice[]>;
+    connectTo?(id: string): Promise<PrinterDevice>;
 };
 
 export class PrintError extends Error {

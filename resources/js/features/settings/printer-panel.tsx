@@ -1,6 +1,6 @@
 import {
     AlertTriangle,
-    BluetoothConnected,
+    BluetoothSearching,
     Check,
     CircleHelp,
     Loader2,
@@ -8,10 +8,11 @@ import {
     PlugZap,
     Printer,
     RefreshCw,
+    Smartphone,
     Unplug,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Panel, StatusBadge } from '@/components/paylo';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,12 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { usePrinter } from '@/hooks/use-printer';
 import { RAWBT_PLAY_URL, transportOptions } from '@/lib/printing';
-import type { Diagnostic, PaperWidth, TransportChoice } from '@/lib/printing';
+import type {
+    Diagnostic,
+    PaperWidth,
+    PrinterDevice,
+    TransportChoice,
+} from '@/lib/printing';
 import type { PrinterTransportSetting } from '@/types';
 
 export type PrinterFormValues = {
@@ -35,6 +41,7 @@ export type PrinterFormValues = {
 
 const TRANSPORT_LABELS: Record<string, string> = {
     auto: 'Otomatis',
+    native: 'Aplikasi Paylo (mandiri)',
     bluetooth: 'Bluetooth (BLE)',
     usb: 'USB',
     serial: 'Serial / COM',
@@ -80,7 +87,8 @@ export function PrinterPanel({
     });
 
     const { state, resolved } = printer;
-    const [busy, setBusy] = useState<'connect' | 'test' | null>(null);
+    const [busy, setBusy] = useState<'connect' | 'test' | 'probe' | null>(null);
+    const [paired, setPaired] = useState<PrinterDevice[]>([]);
     // "Periksa ulang" only needs to force a render — the checks themselves are
     // a plain read of `navigator`, cheap enough to redo on every pass.
     const [, setRecheck] = useState(0);
@@ -130,6 +138,79 @@ export function PrinterPanel({
 
         toast.error(outcome.error ?? 'Tes cetak gagal.', {
             description: outcome.hint,
+        });
+    };
+
+    /**
+     * The single question worth answering first: is this printer BLE, or
+     * Classic-only? A successful connect means the free in-browser route
+     * works; a failure says exactly why it never will.
+     */
+    const probeBle = async () => {
+        setBusy('probe');
+
+        const device = await printer.connect('bluetooth');
+
+        setBusy(null);
+
+        if (device) {
+            toast.success(`${device.name} mendukung BLE.`, {
+                description:
+                    'Printer ini bisa dipakai langsung dari browser, tanpa aplikasi tambahan. Pilih jalur Bluetooth (BLE) lalu simpan.',
+            });
+
+            return;
+        }
+
+        toast.error(state.error ?? 'Printer tidak bisa dibuka lewat BLE.', {
+            description: state.hint ?? undefined,
+        });
+    };
+
+    const loadPaired = async () => {
+        setPaired(await printer.nativeDevices());
+    };
+
+    // Read the pairings once the shell is there. The setState lands in a
+    // promise callback, not in the effect body — this is a subscription to an
+    // external system, not derived state.
+    const { nativeAvailable, nativeDevices } = printer;
+
+    useEffect(() => {
+        if (!nativeAvailable) {
+            return;
+        }
+
+        let cancelled = false;
+
+        void nativeDevices().then((list) => {
+            if (!cancelled) {
+                setPaired(list);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [nativeAvailable, nativeDevices]);
+
+    const pickPaired = async (candidate: PrinterDevice) => {
+        setBusy('connect');
+
+        const device = await printer.connectToNative(candidate.id);
+
+        setBusy(null);
+
+        if (device) {
+            onChange('printer_transport', 'native');
+            onChange('printer_name', device.name);
+            toast.success(`Terhubung ke ${device.name}.`);
+
+            return;
+        }
+
+        toast.error(state.error ?? 'Gagal membuka printer.', {
+            description: state.hint ?? undefined,
         });
     };
 
@@ -215,6 +296,26 @@ export function PrinterPanel({
                             Tes cetak
                         </Button>
 
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={probeBle}
+                            disabled={busy !== null}
+                        >
+                            {busy === 'probe' ? (
+                                <Loader2
+                                    className="size-4 animate-spin"
+                                    aria-hidden
+                                />
+                            ) : (
+                                <BluetoothSearching
+                                    className="size-4"
+                                    aria-hidden
+                                />
+                            )}
+                            Uji printer BLE
+                        </Button>
+
                         {state.device && (
                             <Button
                                 type="button"
@@ -230,22 +331,86 @@ export function PrinterPanel({
 
                     {rawbtNeeded && (
                         <p className="text-xs leading-5 text-muted-foreground">
-                            Mode RawBT butuh aplikasi RawBT terpasang di
-                            perangkat ini.{' '}
+                            RawBT adalah aplikasi pihak ketiga dengan lisensinya
+                            sendiri, dan Paylo tidak membutuhkannya. Jalur
+                            mandiri ada di panel{' '}
+                            <span className="font-medium">
+                                Cetak mandiri tanpa aplikasi tambahan
+                            </span>{' '}
+                            di bawah.{' '}
                             <a
                                 href={RAWBT_PLAY_URL}
                                 target="_blank"
                                 rel="noreferrer noopener"
                                 className="font-medium text-primary underline"
                             >
-                                Pasang RawBT dari Play Store
+                                Halaman RawBT
                             </a>
-                            , lalu pilih printer Bluetooth yang sudah
-                            dipasangkan di dalam aplikasi itu satu kali.
                         </p>
                     )}
                 </div>
             </Panel>
+
+            {/* ── Paired printers, when Paylo is its own app ─ */}
+            {printer.nativeAvailable && (
+                <Panel
+                    title="Printer terpasang di perangkat"
+                    description="Dibaca langsung dari pairing Bluetooth Android. Termasuk printer Bluetooth Classic, yang tidak bisa dilihat browser."
+                    actions={
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={loadPaired}
+                            disabled={busy !== null}
+                        >
+                            <RefreshCw className="size-4" aria-hidden />
+                            Muat ulang
+                        </Button>
+                    }
+                >
+                    {paired.length === 0 ? (
+                        <p className="text-sm leading-5 text-muted-foreground">
+                            Belum ada printer terbaca. Pasangkan printer di
+                            Pengaturan Android → Bluetooth, lalu tekan Muat
+                            ulang.
+                        </p>
+                    ) : (
+                        <ul className="flex flex-col divide-y">
+                            {paired.map((candidate) => (
+                                <li
+                                    key={candidate.id}
+                                    className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+                                >
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm leading-5 font-medium">
+                                            {candidate.name}
+                                        </p>
+                                        <p className="truncate text-xs leading-5 text-muted-foreground">
+                                            {candidate.id}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            state.device?.id === candidate.id
+                                                ? 'secondary'
+                                                : 'outline'
+                                        }
+                                        disabled={busy !== null}
+                                        onClick={() => pickPaired(candidate)}
+                                    >
+                                        {state.device?.id === candidate.id
+                                            ? 'Terpakai'
+                                            : 'Pakai ini'}
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </Panel>
+            )}
 
             {/* ── Transport ────────────────────────────── */}
             <Panel
@@ -458,10 +623,11 @@ export function PrinterPanel({
                 </ul>
             </Panel>
 
-            {/* ── Why the Play Store app connects ──────── */}
+            {/* ── Routes that need no third-party app ──── */}
             <Panel
-                title="Printer tidak mau terhubung?"
-                description="Urutan pemeriksaan yang menyelesaikan hampir semua kasus."
+                title="Cetak mandiri tanpa aplikasi tambahan"
+                description="Empat jalur yang seluruhnya milik Paylo. Coba dari atas."
+                footer="Panduan lengkap beserta perintah build ada di docs/PRINTER.md pada repositori Paylo."
             >
                 <div className="flex flex-col gap-4 text-sm leading-6">
                     <div className="flex gap-3 rounded-lg border bg-muted/30 px-4 py-3">
@@ -471,40 +637,38 @@ export function PrinterPanel({
                         />
                         <p className="text-xs leading-5 text-muted-foreground">
                             <span className="font-semibold text-foreground">
-                                Kenapa aplikasi printer dari Play Store bisa,
-                                tapi Paylo tidak?
+                                Batas yang tidak bisa dilewati kode mana pun:
                             </span>{' '}
-                            Karena keduanya memakai radio Bluetooth yang
-                            berbeda. Printer struk murah hampir selalu{' '}
-                            <em>Bluetooth Classic</em> (SPP). Pairing di
-                            pengaturan Android hanya bisa dipakai aplikasi
-                            native — browser tidak punya API untuk membuka
-                            socket SPP, jadi printer yang sudah tersimpan itu
-                            memang tidak akan pernah muncul di daftar Paylo.
-                            Browser hanya bisa Bluetooth Low Energy (BLE).
+                            browser tidak punya API untuk membuka socket
+                            Bluetooth <em>Classic</em> (SPP), dan printer struk
+                            murah hampir selalu Classic. Itulah sebabnya
+                            aplikasi dari Play Store bisa memakai pairing yang
+                            sudah Anda simpan sementara tab browser tidak.
+                            Supaya Paylo mandiri sepenuhnya, Paylo-lah yang
+                            harus menjadi aplikasinya — langkah 4 di bawah.
                         </p>
                     </div>
 
                     <ol className="flex flex-col gap-3">
                         <Step
-                            icon={BluetoothConnected}
-                            title="Printer BLE — jalur tercepat"
-                            body="Kalau printer mendukung BLE, pilih jalur Bluetooth (BLE), tekan Hubungkan printer, lalu pilih perangkatnya. Paylo langsung mengirim ESC/POS tanpa aplikasi perantara. Pastikan printer menyala dan tidak sedang dipegang aplikasi lain — satu printer hanya bisa dipegang satu aplikasi."
+                            icon={BluetoothSearching}
+                            title="1. Cek dulu: printer Anda mungkin BLE"
+                            body='Tekan "Uji printer BLE" di panel paling atas lalu pilih printer Anda. Banyak printer yang dijual sebagai "Bluetooth" ternyata juga punya jalur BLE. Kalau berhasil, selesai — tidak perlu aplikasi apa pun, tinggal pilih jalur Bluetooth (BLE) dan simpan.'
                         />
                         <Step
                             icon={Plug}
-                            title="Printer Bluetooth Classic — pakai RawBT"
-                            body="Ini kasus paling umum di Indonesia. Pasang aplikasi RawBT, pilih printer yang sudah dipasangkan di dalamnya, lalu di Paylo pilih jalur RawBT. RawBT yang memegang socket SPP; Paylo mengirimkan struk ke sana tanpa dialog cetak. Di terminal Windows, alternatifnya adalah jalur Serial/COM."
+                            title="2. Kabel USB OTG — paling pasti, gratis"
+                            body="Sambungkan printer ke tablet dengan kabel USB OTG, pilih jalur USB, tekan Hubungkan printer. Chrome Android akan meminta izin sekali. Jalur ini melewati Bluetooth sepenuhnya, jadi berlaku untuk printer Classic maupun BLE. Di terminal Windows, printer Bluetooth Classic yang sudah dipasangkan juga bisa dipakai lewat jalur Serial/COM."
                         />
                         <Step
                             icon={AlertTriangle}
-                            title="Buka Paylo lewat HTTPS"
-                            body="Bluetooth, USB, dan Serial dimatikan browser pada alamat http biasa. Kalau baris HTTPS di diagnosa di atas bertanda silang, tombol Hubungkan tidak akan pernah menampilkan daftar perangkat — apa pun printernya."
+                            title="3. Pastikan Paylo dibuka lewat HTTPS"
+                            body="Bluetooth, USB, dan Serial dimatikan browser pada alamat http biasa. Kalau baris HTTPS di Diagnosa bertanda silang, tombol Hubungkan tidak akan pernah memunculkan daftar perangkat — apa pun printernya. Ini sering jadi satu-satunya penyebab."
                         />
                         <Step
-                            icon={Printer}
-                            title="Terakhir: printer sistem"
-                            body="Jika semua jalur langsung tidak tersedia, pilih Printer sistem. Paylo mencetak lewat printer yang sudah dikenal perangkat. Hanya mode ini yang masih memunculkan dialog cetak."
+                            icon={Smartphone}
+                            title="4. Jadikan Paylo aplikasi Android sendiri"
+                            body="Jawaban permanen untuk printer Bluetooth Classic. Bungkus Paylo dengan Capacitor menjadi APK milik Anda sendiri — gratis, tanpa lisensi pihak ketiga. Di dalam APK itu Paylo membaca daftar printer yang sudah dipasangkan Android dan membuka socket SPP-nya langsung; panel 'Printer terpasang di perangkat' akan muncul di halaman ini. Perintah build dan kode jembatannya ada di docs/PRINTER.md."
                         />
                     </ol>
                 </div>

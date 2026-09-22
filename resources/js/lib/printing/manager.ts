@@ -21,7 +21,8 @@ import {
     renderTestPage,
 } from './receipt';
 import type { RenderOptions } from './receipt';
-import { bluetoothTransport } from './transport-bluetooth';
+import { bluetoothProbe, bluetoothTransport } from './transport-bluetooth';
+import { nativeTransport } from './transport-native';
 import { rawbtTransport } from './transport-rawbt';
 import { serialTransport } from './transport-serial';
 import { usbTransport } from './transport-usb';
@@ -79,10 +80,16 @@ export type PrinterState = {
 // ── Transport registry ────────────────────────────────
 
 /**
- * Preference order for `auto`. Wired transports first (nothing to pair), then
- * BLE, then the RawBT bridge, and the OS print dialog only as a fallback.
+ * Preference order for `auto`.
+ *
+ * The native shell comes first: when Paylo runs as its own app it can reach
+ * every printer, including Bluetooth Classic, with no helper app. Then the
+ * wired transports (nothing to pair), then BLE. RawBT is last because it is a
+ * third-party app with its own licence — Paylo never needs it unless none of
+ * the routes above exist.
  */
 const TRANSPORTS: Transport[] = [
+    nativeTransport,
     usbTransport,
     serialTransport,
     bluetoothTransport,
@@ -245,7 +252,12 @@ function renderOptions(label?: string): RenderOptions {
 
 /**
  * The transport to use, given the setting and what this device supports.
- * A saved device wins over the generic order so a paired printer keeps working.
+ *
+ * `support()` only says the *API* exists — on Android, WebUSB is present even
+ * with nothing plugged in. So `auto` ranks by evidence that a printer is
+ * actually there: a live link, then the saved binding, then the native shell
+ * (whose presence means the shop deliberately installed the Paylo app for
+ * this), and only then the declared order.
  */
 function resolveTransport(): Transport | 'browser' {
     if (state.settings.transport !== 'auto') {
@@ -256,6 +268,12 @@ function resolveTransport(): Transport | 'browser' {
         return find(state.settings.transport) ?? 'browser';
     }
 
+    const live = TRANSPORTS.find((transport) => transport.connected());
+
+    if (live) {
+        return live;
+    }
+
     const saved = readSaved();
 
     if (saved) {
@@ -264,6 +282,10 @@ function resolveTransport(): Transport | 'browser' {
         if (preferred?.support().usable) {
             return preferred;
         }
+    }
+
+    if (nativeTransport.support().usable) {
+        return nativeTransport;
     }
 
     return (
@@ -287,6 +309,63 @@ function watchLoss(transport: Transport): void {
             hint: 'Paylo akan menyambung ulang otomatis saat struk berikutnya dicetak.',
         });
     });
+}
+
+/** True when Paylo is running inside its own app shell. */
+export function nativeAvailable(): boolean {
+    return nativeTransport.support().usable;
+}
+
+/**
+ * Printers Android has already paired, listed by the native shell. Empty in a
+ * plain browser, which cannot see Bluetooth Classic pairings at all.
+ */
+export async function nativeDevices(): Promise<PrinterDevice[]> {
+    if (!nativeAvailable() || !nativeTransport.list) {
+        return [];
+    }
+
+    try {
+        return await nativeTransport.list();
+    } catch {
+        return [];
+    }
+}
+
+/** Bind to one printer from `nativeDevices`, bypassing any chooser. */
+export async function connectToNative(
+    id: string,
+): Promise<PrinterDevice | null> {
+    if (!nativeTransport.connectTo) {
+        return null;
+    }
+
+    emit({
+        status: 'connecting',
+        transport: 'native',
+        error: null,
+        hint: null,
+    });
+
+    try {
+        const device = await nativeTransport.connectTo(id);
+
+        watchLoss(nativeTransport);
+        writeSaved(device);
+        emit({
+            status: 'ready',
+            transport: 'native',
+            device,
+            error: null,
+            hint: null,
+        });
+
+        return device;
+    } catch (error) {
+        emit({ status: 'error', ...message(error) });
+
+        return null;
+    }
 }
 
 /**
@@ -569,13 +648,21 @@ export type Diagnostic = {
  */
 export function diagnostics(): Diagnostic[] {
     const secure = window.isSecureContext;
+    const native = nativeTransport.support();
     const bluetooth = bluetoothTransport.support();
     const usb = usbTransport.support();
     const serial = serialTransport.support();
-    const rawbt = rawbtTransport.support();
     const saved = readSaved();
+    const probe = bluetoothProbe();
 
     return [
+        {
+            label: 'Aplikasi Paylo sendiri (jalur mandiri)',
+            ok: native.usable,
+            detail: native.usable
+                ? 'Aktif. Paylo bisa membuka printer Bluetooth Classic maupun BLE langsung, tanpa aplikasi pihak ketiga.'
+                : (native.reason ?? 'Tidak aktif.'),
+        },
         {
             label: 'Koneksi aman (HTTPS)',
             ok: secure,
@@ -591,30 +678,35 @@ export function diagnostics(): Diagnostic[] {
                 'Tersedia. Hanya menjangkau printer BLE, bukan Bluetooth Classic.',
         },
         {
+            // The one check that decides which route a shop must take.
+            label: 'Printer terdeteksi mendukung BLE',
+            ok: probe !== null && probe.writable > 0,
+            detail: !probe
+                ? 'Belum diuji. Tekan "Uji printer BLE" untuk tahu pasti apakah printer Anda bisa dipakai langsung dari browser.'
+                : probe.writable > 0
+                  ? `${probe.deviceName}: ${probe.services.length} service BLE, jalur tulis ${probe.characteristic}. Printer ini bisa dipakai langsung dari browser.`
+                  : `${probe.deviceName}: ${probe.services.length} service BLE, tidak ada jalur tulis. Printer ini Bluetooth Classic saja — browser tidak bisa membukanya.`,
+        },
+        {
             label: 'WebUSB',
             ok: usb.usable,
-            detail: usb.reason ?? 'Tersedia untuk printer kabel USB.',
+            detail:
+                usb.reason ??
+                'Tersedia. Di Android, printer bisa disambung lewat kabel USB OTG dan langsung dipakai tanpa aplikasi apa pun.',
         },
         {
             label: 'Web Serial',
             ok: serial.usable,
             detail:
                 serial.reason ??
-                'Tersedia. Di Windows, printer Bluetooth Classic yang dipasangkan muncul sebagai port COM.',
-        },
-        {
-            label: 'Jembatan RawBT',
-            ok: rawbt.usable,
-            detail:
-                rawbt.reason ??
-                'Perangkat Android terdeteksi. Pasang aplikasi RawBT agar printer Bluetooth Classic bisa dipakai.',
+                'Tersedia. Di Windows, printer Bluetooth Classic yang dipasangkan muncul sebagai port COM keluar dan bisa dipakai langsung.',
         },
         {
             label: 'Printer tersimpan di perangkat ini',
             ok: saved !== null,
             detail: saved
                 ? `${saved.name} (${saved.transport}). Paylo menyambung ulang otomatis saat halaman dibuka.`
-                : 'Belum ada. Tekan "Hubungkan printer" sekali; izin disimpan browser untuk pemakaian berikutnya.',
+                : 'Belum ada. Hubungkan sekali; izinnya disimpan untuk pemakaian berikutnya.',
         },
     ];
 }

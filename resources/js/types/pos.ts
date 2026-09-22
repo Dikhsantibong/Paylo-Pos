@@ -189,6 +189,7 @@ export type PosConfig = {
 
 export type PrinterTransportSetting =
     | 'auto'
+    | 'native'
     | 'bluetooth'
     | 'usb'
     | 'serial'

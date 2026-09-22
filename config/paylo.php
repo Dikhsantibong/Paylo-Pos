@@ -160,7 +160,7 @@ return [
         'printer_transport' => [
             'type' => 'string', 'default' => 'auto', 'group' => 'receipt',
             'label' => 'Jalur printer', 'help' => 'Cara Paylo mengirim struk ke printer. Otomatis memilih jalur terbaik yang didukung perangkat ini.',
-            'rules' => 'nullable|string|in:auto,bluetooth,usb,serial,rawbt,browser',
+            'rules' => 'nullable|string|in:auto,native,bluetooth,usb,serial,rawbt,browser',
         ],
         'printer_paper' => [
             'type' => 'int', 'default' => 58, 'group' => 'receipt',
