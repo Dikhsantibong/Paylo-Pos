@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { CartPanel } from '@/features/pos/cart-panel';
 import { ItemOptionsDialog } from '@/features/pos/item-options-dialog';
@@ -8,6 +8,8 @@ import { ProductGrid } from '@/features/pos/product-grid';
 import { ReceiptDialog } from '@/features/pos/receipt-dialog';
 import { useCart } from '@/features/pos/use-cart';
 import type { CartDraft } from '@/features/pos/use-cart';
+import { usePrinter } from '@/hooks/use-printer';
+import type { PaperWidth, PrinterSettings } from '@/lib/printing';
 import type {
     Category,
     Customer,
@@ -58,6 +60,63 @@ export default function PosIndex({
     );
 
     const searchRef = useRef<HTMLInputElement>(null);
+
+    // Printing never goes through the browser print dialog: the receipt is
+    // rendered to ESC/POS bytes and written straight to the printer. See
+    // resources/js/lib/printing.
+    const printerSettings = useMemo<Partial<PrinterSettings>>(
+        () => ({
+            transport: config.printer_transport,
+            paper: (config.printer_paper === 80 ? 80 : 58) as PaperWidth,
+            autoPrint: config.printer_auto_print,
+            copies: config.printer_copies,
+            cut: config.printer_cut,
+            beep: config.printer_beep,
+            name: config.printer_name,
+        }),
+        [config],
+    );
+
+    const printer = usePrinter(printerSettings);
+    const print = printer.print;
+
+    // Guards against a double print when Inertia remounts the page with the
+    // same receipt still in the shared props.
+    const printedRef = useRef<string | null>(null);
+
+    const sendToPrinter = useCallback(
+        async (target: Receipt, announce: boolean) => {
+            const outcome = await print(target);
+
+            if (outcome.ok) {
+                if (announce) {
+                    toast.success('Struk dikirim ke printer.');
+                }
+
+                return;
+            }
+
+            toast.error(outcome.error ?? 'Struk gagal dicetak.', {
+                description: outcome.hint,
+            });
+        },
+        [print],
+    );
+
+    // Auto-print fires for both paths that can produce a receipt: the POST
+    // response handled in `submit`, and the seeded state on a fresh mount.
+    useEffect(() => {
+        if (!receipt || !config.printer_auto_print) {
+            return;
+        }
+
+        if (printedRef.current === receipt.number) {
+            return;
+        }
+
+        printedRef.current = receipt.number;
+        void sendToPrinter(receipt, false);
+    }, [config.printer_auto_print, receipt, sendToPrinter]);
 
     // A product with no options at all goes straight into the cart.
     const selectProduct = useCallback(
@@ -209,7 +268,13 @@ export default function PosIndex({
                 onConfirm={submit}
             />
 
-            <ReceiptDialog receipt={receipt} onClose={() => setReceipt(null)} />
+            <ReceiptDialog
+                receipt={receipt}
+                onClose={() => setReceipt(null)}
+                onPrint={(target) => sendToPrinter(target, true)}
+                printerStatus={printer.state.status}
+                printerName={printer.state.device?.name ?? null}
+            />
         </>
     );
 }

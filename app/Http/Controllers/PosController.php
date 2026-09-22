@@ -56,6 +56,17 @@ class PosController extends Controller
                 'discount_enabled' => $this->settings->bool('discount_enabled', true),
                 'order_note_enabled' => $this->settings->bool('order_note_enabled', true),
                 'receipt_enabled' => $this->settings->bool('receipt_enabled', true),
+
+                // The cashier screen drives the printer itself — see
+                // resources/js/lib/printing. Only behaviour lives here; the
+                // paired device is remembered by the browser.
+                'printer_transport' => $this->settings->string('printer_transport', 'auto'),
+                'printer_paper' => $this->settings->int('printer_paper', 58),
+                'printer_auto_print' => $this->settings->bool('printer_auto_print'),
+                'printer_copies' => max(1, $this->settings->int('printer_copies', 1)),
+                'printer_cut' => $this->settings->bool('printer_cut', true),
+                'printer_beep' => $this->settings->bool('printer_beep'),
+                'printer_name' => $this->settings->string('printer_name'),
             ],
         ]);
     }

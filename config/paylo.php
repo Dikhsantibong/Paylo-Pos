@@ -33,7 +33,7 @@ return [
         'tax' => ['label' => 'Pajak', 'description' => 'Perhitungan pajak pada setiap transaksi.'],
         'payment' => ['label' => 'Metode pembayaran', 'description' => 'Metode yang bisa dipilih kasir saat menyelesaikan transaksi.'],
         'pos' => ['label' => 'Perilaku kasir', 'description' => 'Fitur opsional pada layar kasir.'],
-        'receipt' => ['label' => 'Struk', 'description' => 'Konfigurasi tampilan dan cetak struk.'],
+        'receipt' => ['label' => 'Struk & printer', 'description' => 'Tampilan struk dan cara Paylo terhubung ke printer thermal.'],
         'session' => ['label' => 'Sesi & perangkat', 'description' => 'Berapa lama kasir tetap login tanpa aktivitas.'],
     ],
 
@@ -154,8 +154,38 @@ return [
         ],
         'printer_name' => [
             'type' => 'string', 'default' => '', 'group' => 'receipt',
-            'label' => 'Nama printer', 'help' => 'Catatan untuk operator. Pencetakan memakai dialog print browser.',
+            'label' => 'Nama printer', 'help' => 'Nama perangkat seperti yang terlihat saat pairing. Dipakai untuk menyambung ulang otomatis.',
             'rules' => 'nullable|string|max:120',
+        ],
+        'printer_transport' => [
+            'type' => 'string', 'default' => 'auto', 'group' => 'receipt',
+            'label' => 'Jalur printer', 'help' => 'Cara Paylo mengirim struk ke printer. Otomatis memilih jalur terbaik yang didukung perangkat ini.',
+            'rules' => 'nullable|string|in:auto,bluetooth,usb,serial,rawbt,browser',
+        ],
+        'printer_paper' => [
+            'type' => 'int', 'default' => 58, 'group' => 'receipt',
+            'label' => 'Lebar kertas (mm)', 'help' => '58 mm = 32 karakter, 80 mm = 48 karakter.',
+            'rules' => 'nullable|integer|in:58,80',
+        ],
+        'printer_auto_print' => [
+            'type' => 'bool', 'default' => false, 'group' => 'receipt',
+            'label' => 'Cetak otomatis setelah bayar', 'help' => 'Struk langsung dikirim ke printer begitu transaksi tersimpan, tanpa kasir menekan tombol.',
+            'rules' => 'nullable|boolean',
+        ],
+        'printer_copies' => [
+            'type' => 'int', 'default' => 1, 'group' => 'receipt',
+            'label' => 'Jumlah salinan', 'help' => 'Salinan kedua dan seterusnya ditandai "SALINAN".',
+            'rules' => 'nullable|integer|min:1|max:5',
+        ],
+        'printer_cut' => [
+            'type' => 'bool', 'default' => true, 'group' => 'receipt',
+            'label' => 'Potong kertas otomatis', 'help' => 'Matikan jika printer tidak punya pemotong — kertas akan dimajukan saja.',
+            'rules' => 'nullable|boolean',
+        ],
+        'printer_beep' => [
+            'type' => 'bool', 'default' => false, 'group' => 'receipt',
+            'label' => 'Bunyikan buzzer', 'help' => 'Menandai struk selesai dicetak. Diabaikan printer tanpa buzzer.',
+            'rules' => 'nullable|boolean',
         ],
 
         // Session ----------------------------------------------

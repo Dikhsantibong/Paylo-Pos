@@ -1,4 +1,4 @@
-import { CheckCircle2, Printer } from 'lucide-react';
+import { CheckCircle2, Loader2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -9,6 +9,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { percent, rupiah } from '@/lib/format';
+import type { PrinterStatus } from '@/lib/printing';
 import type { Receipt } from '@/types';
 
 const TEMPERATURE_LABEL: Record<string, string> = {
@@ -23,21 +24,31 @@ const SUGAR_LABEL: Record<string, string> = {
 };
 
 /**
- * Post-sale confirmation and printable receipt.
+ * Post-sale confirmation.
  *
- * Printing uses the browser dialog — the `print:` utilities in app.css hide the
- * app shell so only this panel reaches the paper.
+ * This panel is what the cashier sees; it is never what gets printed. Pressing
+ * "Cetak struk" hands the sale to the printer manager, which renders ESC/POS
+ * bytes and writes them to the connected printer — no print dialog, no
+ * navigation away from the till.
  */
 export function ReceiptDialog({
     receipt,
     onClose,
+    onPrint,
+    printerStatus = 'idle',
+    printerName = null,
 }: {
     receipt: Receipt | null;
     onClose: () => void;
+    onPrint?: (receipt: Receipt) => void;
+    printerStatus?: PrinterStatus;
+    printerName?: string | null;
 }) {
     if (!receipt) {
         return null;
     }
+
+    const printing = printerStatus === 'printing';
 
     const issued = new Date(receipt.created_at).toLocaleString('id-ID', {
         day: '2-digit',
@@ -66,8 +77,8 @@ export function ReceiptDialog({
                     id="paylo-receipt"
                     className="max-h-[58vh] overflow-y-auto px-5 py-4 text-sm"
                 >
-                    <div className="border-b border-dashed pb-4 pt-2 text-center">
-                        <h1 className="text-lg leading-tight font-black uppercase tracking-wider text-foreground">
+                    <div className="border-b border-dashed pt-2 pb-4 text-center">
+                        <h1 className="text-lg leading-tight font-black tracking-wider text-foreground uppercase">
                             {receipt.shop.name}
                         </h1>
                         {receipt.shop.tagline && (
@@ -87,13 +98,15 @@ export function ReceiptDialog({
                         )}
 
                         <div className="mt-3 flex flex-col gap-0.5 border-t border-dashed pt-3 text-xs text-muted-foreground">
-                            <p className="tabular text-foreground/80 font-medium">
+                            <p className="tabular font-medium text-foreground/80">
                                 {receipt.number}
                             </p>
                             <p>{issued}</p>
                             <p>
                                 Kasir {receipt.cashier ?? '—'}
-                                {receipt.customer ? ` · ${receipt.customer}` : ''}
+                                {receipt.customer
+                                    ? ` · ${receipt.customer}`
+                                    : ''}
                             </p>
                         </div>
                     </div>
@@ -191,7 +204,7 @@ export function ReceiptDialog({
                                 Catatan: {receipt.notes}
                             </p>
                         )}
-                        
+
                         {receipt.footer && (
                             <p className="mb-4 text-xs text-muted-foreground">
                                 {receipt.footer}
@@ -209,14 +222,27 @@ export function ReceiptDialog({
                     </div>
                 </div>
 
-                <DialogFooter className="gap-2 border-t px-5 py-4 sm:justify-between print:hidden">
+                <DialogFooter className="flex-col gap-2 border-t px-5 py-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() => window.print()}
+                        disabled={printing || !onPrint}
+                        onClick={() => onPrint?.(receipt)}
+                        title={
+                            printerName
+                                ? `Kirim ke ${printerName}`
+                                : 'Printer belum terhubung — atur di Pengaturan → Struk & printer'
+                        }
                     >
-                        <Printer className="size-4" aria-hidden />
-                        Cetak struk
+                        {printing ? (
+                            <Loader2
+                                className="size-4 animate-spin"
+                                aria-hidden
+                            />
+                        ) : (
+                            <Printer className="size-4" aria-hidden />
+                        )}
+                        {printing ? 'Mencetak…' : 'Cetak struk'}
                     </Button>
                     <Button
                         type="button"

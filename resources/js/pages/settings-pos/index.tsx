@@ -23,6 +23,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { PrinterPanel } from '@/features/settings/printer-panel';
+import type { PrinterFormValues } from '@/features/settings/printer-panel';
 import type { PosSettings } from '@/types';
 
 type Props = {
@@ -63,6 +65,13 @@ export default function SettingsPosIndex({ settings, logoUrl }: Props) {
 
     const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
         setForm((current) => ({ ...current, [key]: value }));
+
+    // The printer panel only knows its own keys, so it gets a setter narrowed
+    // to them rather than the whole form's.
+    const setPrinter = <K extends keyof PrinterFormValues>(
+        key: K,
+        value: PrinterFormValues[K],
+    ) => setForm((current) => ({ ...current, [key]: value }));
 
     const dirty = useMemo(
         () =>
@@ -173,7 +182,7 @@ export default function SettingsPosIndex({ settings, logoUrl }: Props) {
                             Kasir
                         </Tab>
                         <Tab value="receipt" icon={Receipt}>
-                            Struk
+                            Struk & printer
                         </Tab>
                         <Tab value="device" icon={Smartphone}>
                             Sesi & perangkat
@@ -503,8 +512,11 @@ export default function SettingsPosIndex({ settings, logoUrl }: Props) {
                         </Panel>
                     </TabsContent>
 
-                    {/* ── Receipt ──────────────────────────────── */}
-                    <TabsContent value="receipt">
+                    {/* ── Receipt & printer ───────────────────── */}
+                    <TabsContent
+                        value="receipt"
+                        className="flex flex-col gap-6"
+                    >
                         <Panel
                             title="Struk"
                             description="Ditampilkan setelah transaksi tersimpan."
@@ -512,50 +524,38 @@ export default function SettingsPosIndex({ settings, logoUrl }: Props) {
                             <div className="flex flex-col gap-5">
                                 <Toggle
                                     label="Tampilkan struk setelah transaksi"
-                                    help="Struk muncul otomatis dan siap dicetak lewat dialog print browser."
+                                    help="Struk muncul di layar sebagai konfirmasi. Pencetakan ke printer thermal diatur di panel di bawah."
                                     checked={form.receipt_enabled}
                                     onChange={(v) => set('receipt_enabled', v)}
                                 />
 
-                                <div className="grid gap-5 border-t pt-5 sm:grid-cols-2">
-                                    <Field
-                                        label="Catatan kaki struk"
-                                        error={errors.receipt_footer}
-                                        className="sm:col-span-2"
-                                    >
-                                        <Textarea
-                                            value={form.receipt_footer}
-                                            onChange={(e) =>
-                                                set(
-                                                    'receipt_footer',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            rows={2}
-                                            placeholder="Terima kasih atas kunjungan Anda."
-                                            className="resize-none"
-                                        />
-                                    </Field>
-
-                                    <Field
-                                        label="Nama printer"
-                                        help="Catatan untuk operator. Pencetakan memakai dialog print browser."
-                                        error={errors.printer_name}
-                                    >
-                                        <Input
-                                            value={form.printer_name}
-                                            onChange={(e) =>
-                                                set(
-                                                    'printer_name',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="POS-80"
-                                        />
-                                    </Field>
-                                </div>
+                                <Field
+                                    label="Catatan kaki struk"
+                                    error={errors.receipt_footer}
+                                    className="border-t pt-5"
+                                >
+                                    <Textarea
+                                        value={form.receipt_footer}
+                                        onChange={(e) =>
+                                            set(
+                                                'receipt_footer',
+                                                e.target.value,
+                                            )
+                                        }
+                                        rows={2}
+                                        placeholder="Terima kasih atas kunjungan Anda."
+                                        className="resize-none"
+                                    />
+                                </Field>
                             </div>
                         </Panel>
+
+                        <PrinterPanel
+                            values={form}
+                            onChange={setPrinter}
+                            errors={errors}
+                            shopName={form.shop_name}
+                        />
                     </TabsContent>
 
                     {/* ── Session & device ─────────────────────── */}

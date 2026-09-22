@@ -177,7 +177,23 @@ export type PosConfig = {
     discount_enabled: boolean;
     order_note_enabled: boolean;
     receipt_enabled: boolean;
+    /** Printer behaviour — the device itself is remembered by the browser. */
+    printer_transport: PrinterTransportSetting;
+    printer_paper: number;
+    printer_auto_print: boolean;
+    printer_copies: number;
+    printer_cut: boolean;
+    printer_beep: boolean;
+    printer_name: string;
 };
+
+export type PrinterTransportSetting =
+    | 'auto'
+    | 'bluetooth'
+    | 'usb'
+    | 'serial'
+    | 'rawbt'
+    | 'browser';
 
 export type CartItemAddon = {
     product_addon_id: number;
@@ -546,6 +562,12 @@ export type PosSettings = {
     receipt_enabled: boolean;
     receipt_footer: string;
     printer_name: string;
+    printer_transport: PrinterTransportSetting;
+    printer_paper: number;
+    printer_auto_print: boolean;
+    printer_copies: number;
+    printer_cut: boolean;
+    printer_beep: boolean;
     session_lifetime: number;
     session_keepalive: boolean;
 };
